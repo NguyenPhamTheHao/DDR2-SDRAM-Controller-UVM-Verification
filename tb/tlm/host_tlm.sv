@@ -9,6 +9,8 @@ class host_tlm extends uvm_sequence_item;
     // Initialization is controlled explicitly by the initialization sequence,
     // not randomized with normal host memory transactions.
     bit  INITDDR;
+    bit  cmd_put;
+    bit  put_dataFIFO;
     rand bit [2:0]  CMD;
     rand bit [1:0]  SZ;
     rand bit [ADDR_WIDTH-1:0]  ADDR;
@@ -28,15 +30,18 @@ class host_tlm extends uvm_sequence_item;
         CMD inside {NOP, SCR, SCW, BLR, BLW};
     }
     constraint valid_size {
-        if(CMD inside {NOP, SCR, SCW}) SZ=2'b00;
+        if (CMD inside {NOP, SCR, SCW}) SZ == 2'b00;
     }
     
     `uvm_object_utils_begin(host_tlm)
         `uvm_field_int(INITDDR, UVM_ALL_ON)
+        `uvm_field_int(cmd_put, UVM_ALL_ON)
+        `uvm_field_int(put_dataFIFO, UVM_ALL_ON)
         `uvm_field_int(CMD, UVM_ALL_ON)
         `uvm_field_int(SZ, UVM_ALL_ON)
         `uvm_field_int(ADDR, UVM_ALL_ON)
         `uvm_field_int(DIN, UVM_ALL_ON)
+        `uvm_field_int(FETCHING, UVM_ALL_ON)
         `uvm_field_int(DOUT, UVM_ALL_ON)
         `uvm_field_int(RADDR, UVM_ALL_ON)
         `uvm_field_int(FILLCOUNT, UVM_ALL_ON)
