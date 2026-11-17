@@ -5,6 +5,10 @@ package uvm_tb_udf_pkg;
   parameter int HALF_CLK = 1;  // CLK = 500 MHz
   parameter int HALF_DDR2_CK  = 2;  // CK  = 250 MHz
 
+  // Shared model/configuration constants.
+  parameter int unsigned CLK_MHZ = 500;
+  parameter int unsigned DDR2_CK_MHZ = 250;
+
   // Clock relationship
   parameter int unsigned CK_PER_CLK = HALF_DDR2_CK/HALF_CLK;
 
@@ -21,6 +25,8 @@ package uvm_tb_udf_pkg;
   
   // Data and address widths
   parameter int unsigned DQ_WIDTH = 16;
+  // Common name used by the host and DDR2 transaction classes.
+  parameter int unsigned DATA_WIDTH = DQ_WIDTH;
   parameter int unsigned DQS_WIDTH = 2;
   parameter int unsigned DM_WIDTH = 2;
   parameter int unsigned ROW_ADDR_WIDTH = 13;
@@ -28,6 +34,11 @@ package uvm_tb_udf_pkg;
   parameter int unsigned BANK_ADDR_WIDTH = 2;
   parameter int unsigned ADDR_WIDTH = 25;
   parameter int unsigned RANK_BITS  = 1;
+  parameter int unsigned DDR2_BANK_COUNT = (1 << BANK_ADDR_WIDTH);
+  parameter int unsigned DDR2_RANK_COUNT = (1 << RANK_BITS);
+  parameter int unsigned DDR2_ROW_COUNT = (1 << ROW_ADDR_WIDTH);
+  parameter int unsigned DDR2_COLUMN_COUNT = (1 << COL_ADDR_WIDTH);
+  parameter int unsigned DDR2_MODEL_MEM_DEPTH = 1024;
 
   // FIFO configuration
   parameter int unsigned FIFO_DEPTH = 64;
@@ -46,8 +57,9 @@ package uvm_tb_udf_pkg;
   parameter int unsigned T_MRD_CK_CYCLES  = 2;
   parameter int unsigned T_WR_CK_CYCLES   = 4;
   parameter int unsigned T_RTP_CK_CYCLES  = 2;
-  parameter int unsigned T_WTR_CK_CYCLES  = 2;
-  parameter int unsigned T_RTW_CK_CYCLES  = 4;
+  // Direct command-to-command turnaround spacing for the BL=8, CL=4 profile.
+  parameter int unsigned T_WTR_CK_CYCLES  = 9; // WRITE command -> READ command
+  parameter int unsigned T_RTW_CK_CYCLES  = 6; // READ command -> WRITE command
   parameter int unsigned T_FAW_CK_CYCLES  = 20;
   parameter int unsigned T_XSR_CK_CYCLES  = 50;
   parameter int unsigned T_DLLK_CK_CYCLES = 200;
@@ -55,6 +67,11 @@ package uvm_tb_udf_pkg;
   // 200 us power-up wait:
   // 200 us / 4 ns per CK cycle = 50,000 CK cycles
   parameter int unsigned T_INIT_CK_CYCLES = 50_000;
+
+  // Project-specific timing values not otherwise listed above.
+  parameter int unsigned T_RRD_CLK_CYCLES = 2;
+  parameter int unsigned REFRESH_TRIGGER_CLK_CYCLES = 3800;
+  parameter int unsigned REFRESH_MAX_INTERVAL_CLK_CYCLES = 3900;
 
   // Convert timing counts from DDR2 CK cycles to CLK cycles
   parameter int unsigned T_RCD_CLK_CYCLES  = T_RCD_CK_CYCLES  * CK_PER_CLK;
